@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ZOA — Niche Finder for YouTube Creators</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Bebas+Neue&display=swap" rel="stylesheet">
+<script>
+function toggleGuide(){
+  const o=document.getElementById('guideOverlay');
+  o.style.display=(o.style.display==='none'||o.style.display==='')?'block':'none';
+}
+function closeGuide(e){
+  if(e.target===document.getElementById('guideOverlay'))toggleGuide();
+}
+</script>
+<style>
+:root{
+  --bg:#03030a;--surface:#080812;--surface2:#0d0d1a;
+  --border:#151525;--border2:#1e1e35;
+  --cyan:#00d4ff;--violet:#8b5cf6;--pink:#f43f8e;
+  --gold:#fbbf24;--green:#00e5a0;
+  --text:#eeeef5;--muted:#55556a;--muted2:#3a3a55;--card:#08080f;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:'Space Grotesk',sans-serif;min-height:100vh;overflow-x:hidden;}
+body::after{content:'';position:fixed;inset:0;background-image:linear-gradient(var(--border) 1px,transparent 1px),linear-gradient(90deg,var(--border) 1px,transparent 1px);background-size:60px 60px;pointer-events:none;z-index:0;opacity:.25;}
+.orb{position:fixed;border-radius:50%;filter:blur(140px);pointer-events:none;z-index:0;}
+.orb-1{width:700px;height:700px;background:#00d4ff0d;top:-250px;left:-150px;}
+.orb-2{width:600px;height:600px;background:#8b5cf60a;bottom:-200px;right:-150px;}
+.orb-3{width:350px;height:350px;background:#f43f8e06;top:50%;left:50%;transform:translate(-50%,-50%);}
+.wrap{max-width:920px;margin:0 auto;padding:0 24px;position:relative;z-index:1;}
+
+/* NAV */
+nav{padding:22px 0;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border2);}
+.logo{display:flex;align-items:center;gap:10px;}
+.logo-mark{width:38px;height:38px;background:linear-gradient(135deg,var(--cyan),var(--violet));border-radius:10px;display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:1rem;color:#fff;letter-spacing:2px;box-shadow:0 0 24px #00d4ff33;}
+.logo-text{font-family:'Bebas Neue',sans-serif;font-size:1.6rem;letter-spacing:4px;line-height:1;}
+.logo-sub{font-size:0.58rem;color:var(--muted);letter-spacing:2px;text-transform:uppercase;margin-top:1px;}
+.nav-right{display:flex;align-items:center;gap:10px;}
+.btn-api{background:transparent;border:1px solid var(--border2);color:var(--cyan);font-family:'Space Grotesk',sans-serif;font-size:0.72rem;font-weight:600;padding:8px 16px;border-radius:8px;cursor:pointer;transition:all .2s;display:flex;align-items:center;gap:6px;}
+.btn-api:hover{border-color:var(--cyan);background:#00d4ff0d;}
+.live{display:flex;align-items:center;gap:5px;}
+.live-dot{width:7px;height:7px;background:var(--green);border-radius:50%;box-shadow:0 0 8px var(--green);animation:blink 2s ease infinite;}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.4}}
+.live-label{font-size:0.6rem;color:var(--muted);letter-spacing:1px;text-transform:uppercase;font-weight:600;}
+
+/* HERO */
+.hero{padding:90px 0 60px;text-align:center;}
+.hero-pill{display:inline-flex;align-items:center;gap:8px;background:var(--surface2);border:1px solid var(--border2);border-radius:100px;padding:6px 16px;font-size:0.71rem;font-weight:600;color:var(--muted);margin-bottom:28px;letter-spacing:.5px;}
+.pill-dot{width:6px;height:6px;background:var(--cyan);border-radius:50%;box-shadow:0 0 6px var(--cyan);}
+h1{font-family:'Bebas Neue',sans-serif;font-size:clamp(3rem,9vw,6rem);line-height:.92;letter-spacing:2px;margin-bottom:24px;}
+.l1{display:block;color:var(--text);}
+.l2{display:block;background:linear-gradient(90deg,var(--cyan),var(--violet),var(--pink));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.hero-desc{font-size:.97rem;color:var(--muted);max-width:480px;margin:0 auto 50px;line-height:1.75;}
+
+/* STATS */
+.stats{display:flex;max-width:480px;margin:0 auto 70px;border:1px solid var(--border2);border-radius:14px;overflow:hidden;}
+.stat{flex:1;padding:18px 12px;border-right:1px solid var(--border2);text-align:center;background:var(--card);}
+.stat:last-child{border:none;}
+.sv{font-family:'Bebas Neue',sans-serif;font-size:2rem;letter-spacing:1px;background:linear-gradient(135deg,var(--cyan),var(--violet));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;line-height:1;display:block;margin-bottom:3px;}
+.sl{font-size:.65rem;color:var(--muted);font-weight:500;letter-spacing:.5px;}
+
+/* FORM */
+.form-card{background:var(--card);border:1px solid var(--border2);border-radius:20px;padding:32px;margin-bottom:20px;position:relative;overflow:hidden;}
+.form-card::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--cyan),var(--violet),transparent);}
+.form-title{font-family:'Bebas Neue',sans-serif;font-size:1.5rem;letter-spacing:2px;margin-bottom:4px;}
+.form-title span{color:var(--cyan);}
+.form-sub{font-size:.76rem;color:var(--muted);margin-bottom:22px;}
+
+.api-row{display:flex;align-items:flex-start;gap:10px;background:var(--surface2);border:1px solid var(--border2);border-radius:12px;padding:12px 14px;margin-bottom:18px;}
+.api-lbl{font-size:.6rem;color:var(--cyan);text-transform:uppercase;letter-spacing:1.5px;font-weight:700;margin-bottom:5px;}
+.api-row input{width:100%;background:transparent;border:none;color:var(--text);font-family:'Space Grotesk',sans-serif;font-size:.83rem;outline:none;}
+.api-row input::placeholder{color:var(--muted2);}
+
+.ig{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px;}
+@media(max-width:560px){.ig{grid-template-columns:1fr;}}
+.field label{display:block;font-size:.6rem;font-weight:700;color:var(--muted);margin-bottom:6px;text-transform:uppercase;letter-spacing:1px;}
+.field select,.field textarea{width:100%;background:var(--surface2);border:1px solid var(--border2);border-radius:10px;padding:11px 14px;color:var(--text);font-size:.83rem;font-family:'Space Grotesk',sans-serif;outline:none;transition:border-color .2s,box-shadow .2s;-webkit-appearance:none;}
+.field select:focus,.field textarea:focus{border-color:var(--cyan);box-shadow:0 0 0 3px #00d4ff10;}
+.field select option{background:var(--surface2);}
+.field textarea{resize:vertical;min-height:85px;}
+
+.pill-lbl{font-size:.6rem;color:var(--muted);text-transform:uppercase;letter-spacing:1px;font-weight:700;margin-bottom:8px;}
+.pill-row{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:20px;}
+.pill{background:var(--surface2);border:1px solid var(--border2);border-radius:8px;padding:5px 12px;font-size:.72rem;font-weight:600;cursor:pointer;transition:all .2s;color:var(--muted);}
+.pill:hover{border-color:var(--cyan);color:var(--cyan);}
+.pill.active{background:#00d4ff12;border-color:var(--cyan);color:var(--cyan);}
+
+.loader{display:none;margin:14px 0;}
+.loader.on{display:block;}
+.loader-bar{height:2px;background:var(--border2);border-radius:2px;overflow:hidden;}
+.loader-fill{height:100%;background:linear-gradient(90deg,var(--cyan),var(--violet),var(--pink),var(--cyan));background-size:200% 100%;animation:sh 1.5s linear infinite;border-radius:2px;}
+@keyframes sh{0%{background-position:200% 0}100%{background-position:-200% 0}}
+.loader-text{text-align:center;font-size:.76rem;color:var(--muted);margin-top:10px;}
+.loader-text em{color:var(--cyan);font-style:normal;}
+
+.btn-gen{width:100%;background:linear-gradient(135deg,var(--cyan),var(--violet));color:#fff;border:none;border-radius:12px;padding:16px;font-family:'Space Grotesk',sans-serif;font-size:.93rem;font-weight:700;cursor:pointer;transition:all .25s;display:flex;align-items:center;justify-content:center;gap:8px;box-shadow:0 4px 30px #00d4ff22;}
+.btn-gen:hover{transform:translateY(-2px);box-shadow:0 8px 40px #00d4ff33;}
+.btn-gen:disabled{opacity:.5;cursor:not-allowed;transform:none;box-shadow:none;}
+
+/* RESULTS */
+#results{display:none;}
+#results.on{display:block;}
+.res-bar{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;flex-wrap:wrap;gap:10px;}
+.res-title{font-family:'Bebas Neue',sans-serif;font-size:1.3rem;letter-spacing:2px;display:flex;align-items:center;gap:10px;}
+.res-badge{font-family:'Space Grotesk',sans-serif;font-size:.6rem;font-weight:700;background:#00e5a018;border:1px solid #00e5a044;color:var(--green);border-radius:6px;padding:3px 8px;letter-spacing:1px;}
+.btn-copy-all{background:var(--surface2);border:1px solid var(--border2);color:var(--muted);border-radius:8px;padding:7px 14px;font-size:.72rem;cursor:pointer;font-family:'Space Grotesk',sans-serif;font-weight:600;transition:all .2s;}
+.btn-copy-all:hover{border-color:var(--cyan);color:var(--cyan);}
+
+.rs{background:var(--card);border:1px solid var(--border2);border-radius:16px;padding:20px;margin-bottom:12px;position:relative;overflow:hidden;animation:fu .4s ease forwards;opacity:0;}
+.rs:nth-child(1){animation-delay:.05s;}
+.rs:nth-child(2){animation-delay:.12s;}
+.rs:nth-child(3){animation-delay:.19s;}
+.rs:nth-child(4){animation-delay:.26s;}
+.rs:nth-child(5){animation-delay:.33s;}
+@keyframes fu{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+.rs::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--gl,var(--cyan)),transparent);opacity:.4;}
+.rs.v{--gl:var(--violet)}.rs.p{--gl:var(--pink)}.rs.g{--gl:var(--green)}.rs.gd{--gl:var(--gold)}
+.r-lbl{font-size:.6rem;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;margin-bottom:12px;display:flex;align-items:center;gap:6px;}
+.r-cnt{font-size:.82rem;color:#c0c0d0;line-height:1.85;white-space:pre-wrap;word-break:break-word;}
+.r-cp{margin-top:10px;background:transparent;border:1px solid var(--border2);color:var(--muted);border-radius:6px;padding:5px 12px;font-size:.7rem;cursor:pointer;font-family:'Space Grotesk',sans-serif;transition:all .2s;}
+.r-cp:hover{border-color:var(--cyan);color:var(--cyan);}
+
+.ideas-grid{display:grid;gap:10px;}
+.idea-card{background:var(--surface2);border:1px solid var(--border2);border-radius:12px;padding:14px;cursor:pointer;transition:all .2s;position:relative;overflow:hidden;}
+.idea-card::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:linear-gradient(135deg,var(--cyan),var(--violet));border-radius:3px 0 0 3px;opacity:0;transition:opacity .2s;}
+.idea-card:hover,.idea-card.sel{border-color:var(--cyan);background:#00d4ff08;}
+.idea-card:hover::before,.idea-card.sel::before{opacity:1;}
+.idea-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px;}
+.idea-num{font-size:.6rem;font-weight:700;color:var(--cyan);letter-spacing:1px;text-transform:uppercase;}
+.idea-sc{font-size:.6rem;font-weight:700;padding:2px 8px;border-radius:5px;}
+.sc-h{background:#ff3c3c18;color:#ff5555;border:1px solid #ff3c3c44;}
+.sc-r{background:#fbbf2418;color:var(--gold);border:1px solid #fbbf2444;}
+.sc-s{background:#00e5a018;color:var(--green);border:1px solid #00e5a044;}
+.idea-t{font-size:.87rem;font-weight:700;color:var(--text);margin-bottom:4px;}
+.idea-w{font-size:.73rem;color:var(--muted);line-height:1.5;}
+.idea-f{font-size:.63rem;color:var(--violet);margin-top:5px;font-weight:600;}
+
+.tags-wrap{display:flex;flex-wrap:wrap;gap:6px;}
+.tag-chip{background:var(--surface2);border:1px solid var(--border2);border-radius:6px;padding:4px 10px;font-size:.7rem;color:var(--muted);cursor:pointer;transition:all .2s;font-weight:500;}
+.tag-chip:hover{border-color:var(--violet);color:var(--violet);}
+
+/* HOW */
+.how{padding:70px 0;}
+.s-lbl{font-size:.63rem;font-weight:700;color:var(--cyan);letter-spacing:3px;text-transform:uppercase;text-align:center;margin-bottom:10px;}
+.s-title{font-family:'Bebas Neue',sans-serif;font-size:clamp(1.8rem,4vw,2.8rem);letter-spacing:2px;text-align:center;margin-bottom:8px;}
+.s-sub{text-align:center;color:var(--muted);font-size:.84rem;margin-bottom:44px;}
+.how-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;}
+@media(max-width:560px){.how-grid{grid-template-columns:1fr;}}
+.hc{background:var(--card);border:1px solid var(--border2);border-radius:16px;padding:22px;position:relative;overflow:hidden;}
+.hc::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--hc,var(--cyan)),transparent);}
+.hc:nth-child(2){--hc:var(--violet)}.hc:nth-child(3){--hc:var(--pink)}
+.hc-n{font-family:'Bebas Neue',sans-serif;font-size:3rem;letter-spacing:2px;color:var(--border2);line-height:1;margin-bottom:10px;}
+.hc-i{font-size:1.3rem;margin-bottom:8px;}
+.hc-t{font-weight:700;font-size:.88rem;margin-bottom:6px;}
+.hc-d{font-size:.75rem;color:var(--muted);line-height:1.6;}
+
+/* FOOTER */
+footer{border-top:1px solid var(--border2);padding:28px 0;text-align:center;color:var(--muted);font-size:.72rem;}
+.fl{font-family:'Bebas Neue',sans-serif;font-size:1.5rem;letter-spacing:4px;background:linear-gradient(90deg,var(--cyan),var(--violet));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;display:block;margin-bottom:6px;}
+
+/* MODAL */
+#guideOverlay{display:none;position:fixed;inset:0;background:#00000090;z-index:1000;backdrop-filter:blur(6px);padding:20px;overflow-y:auto;}
+.gm{background:#080812;border:1px solid var(--border2);border-radius:20px;max-width:540px;margin:50px auto;overflow:hidden;position:relative;}
+.gm::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--cyan),var(--violet),var(--pink));}
+.gh{padding:22px 24px 18px;border-bottom:1px solid var(--border2);display:flex;justify-content:space-between;align-items:flex-start;}
+.gh-t{font-family:'Bebas Neue',sans-serif;font-size:1.2rem;letter-spacing:2px;margin-bottom:3px;}
+.gh-s{font-size:.72rem;color:var(--muted);}
+.g-x{background:var(--surface2);border:1px solid var(--border2);color:var(--muted);width:30px;height:30px;border-radius:8px;cursor:pointer;font-size:.9rem;display:flex;align-items:center;justify-content:center;transition:all .2s;flex-shrink:0;}
+.g-x:hover{border-color:var(--cyan);color:var(--cyan);}
+.gb{padding:22px;}
+.g-info{background:#00d4ff0a;border:1px solid #00d4ff22;border-radius:10px;padding:12px 14px;margin-bottom:18px;font-size:.75rem;color:#a0e4f5;line-height:1.6;display:flex;gap:8px;}
+.g-warn{background:#0a0800;border:1px solid #fbbf2422;border-radius:10px;padding:12px 14px;margin-bottom:18px;font-size:.75rem;color:#fcd5b5;line-height:1.6;display:flex;gap:8px;}
+.g-step{display:flex;gap:12px;margin-bottom:16px;align-items:flex-start;}
+.g-num{width:28px;height:28px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:.7rem;font-weight:700;flex-shrink:0;color:#fff;}
+.g-t{font-size:.84rem;font-weight:700;color:var(--text);margin-bottom:3px;}
+.g-d{font-size:.75rem;color:var(--muted);line-height:1.6;}
+.g-link{display:inline-flex;align-items:center;gap:5px;background:#00d4ff10;border:1px solid #00d4ff33;color:var(--cyan);border-radius:7px;padding:5px 12px;font-size:.72rem;font-weight:600;text-decoration:none;margin-top:7px;transition:all .2s;}
+.g-link:hover{background:#00d4ff20;}
+.g-code{background:var(--surface2);border:1px solid var(--border2);border-radius:7px;padding:8px 12px;margin-top:7px;font-family:monospace;font-size:.72rem;color:var(--violet);}
+.g-div{width:1px;height:12px;background:var(--border2);margin:0 0 4px 14px;}
+.btn-got{width:100%;background:linear-gradient(135deg,var(--cyan),var(--violet));color:#fff;border:none;border-radius:12px;padding:14px;font-family:'Space Grotesk',sans-serif;font-size:.9rem;font-weight:700;cursor:pointer;transition:all .2s;}
+.btn-got:hover{opacity:.9;transform:translateY(-1px);}
+</style>
+</head>
+<body>
+<div class="orb orb-1"></div>
+<div class="orb orb-2"></div>
+<div class="orb orb-3"></div>
+
+<!-- MODAL -->
+<div id="guideOverlay" onclick="closeGuide(event)">
+  <div class="gm">
+    <div class="gh">
+      <div><div class="gh-t">GET YOUR API KEY</div><div class="gh-s">Free to start · 5 minutes setup</div></div>
+      <button class="g-x" onclick="toggleGuide()">✕</button>
+    </div>
+    <div class="gb">
+      <div class="g-info"><span>💡</span><div><strong style="color:var(--cyan)">$5 = ~500 generations.</strong> Each use costs ~$0.01. Your key stays only in your browser — ZOA never stores it.</div></div>
+      <div class="g-step">
+        <div class="g-num" style="background:linear-gradient(135deg,var(--cyan),var(--violet))">1</div>
+        <div><div class="g-t">Open Anthropic Console</div><div class="g-d">Click the link below</div><a href="https://console.anthropic.com" target="_blank" class="g-link">🔗 console.anthropic.com ↗</a></div>
+      </div>
+      <div class="g-div"></div>
+      <div class="g-step">
+        <div class="g-num" style="background:var(--violet)">2</div>
+        <div><div class="g-t">Create Free Account</div><div class="g-d">Click <strong style="color:var(--text)">"Sign Up"</strong> → email → verify phone</div></div>
+      </div>
+      <div class="g-div"></div>
+      <div class="g-step">
+        <div class="g-num" style="background:var(--gold);color:#000">3</div>
+        <div><div class="g-t">Generate API Key</div><div class="g-d">Left menu → <strong style="color:var(--text)">"API Keys"</strong> → <strong style="color:var(--text)">"Create Key"</strong> → copy immediately!</div><div class="g-code">sk-ant-api03-xxxxxxxxxxxx...</div></div>
+      </div>
+      <div class="g-div"></div>
+      <div class="g-step">
+        <div class="g-num" style="background:var(--green);color:#000">4</div>
+        <div><div class="g-t">Add $5 Credit</div><div class="g-d">Left menu → <strong style="color:var(--text)">"Billing"</strong> → <strong style="color:var(--text)">"Add Credits"</strong> → minimum $5</div></div>
+      </div>
+      <div class="g-warn"><span>⚠️</span><div>The key is shown <strong>only once.</strong> Copy and save it before closing!</div></div>
+      <button class="btn-got" onclick="toggleGuide()">Got it — Start Finding Niches ⚡</button>
+    </div>
+  </div>
+</div>
+
+<div class="wrap">
+  <!-- NAV -->
+  <nav>
+    <div class="logo">
+      <div class="logo-mark">Z</div>
+      <div><div class="logo-text">ZOA</div><div class="logo-sub">Niche Finder</div></div>
+    </div>
+    <div class="nav-right">
+      <button class="btn-api" onclick="toggleGuide()">🔑 Get API Key</button>
+      <div class="live"><div class="live-dot"></div><span class="live-label">Live</span></div>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <div class="hero">
+    <div class="hero-pill"><div class="pill-dot"></div>AI-powered niche research for YouTube creators</div>
+    <h1><span class="l1">FIND YOUR</span><span class="l2">WINNING NICHE</span></h1>
+    <p class="hero-desc">Enter your channel category and idea. ZOA analyzes trends, competition, and viral patterns to give you the perfect content strategy — instantly.</p>
+    <div class="stats">
+      <div class="stat"><span class="sv">50+</span><span class="sl">Categories</span></div>
+      <div class="stat"><span class="sv">AI</span><span class="sl">Powered</span></div>
+      <div class="stat"><span class="sv">FREE</span><span class="sl">Always</span></div>
+    </div>
+  </div>
+
+  <!-- FORM -->
+  <div class="form-card">
+    <div class="form-title">ANALYZE YOUR <span>NICHE</span></div>
+    <div class="form-sub">Fill in your details — ZOA does the rest</div>
+
+    <div class="api-row">
+      <span style="font-size:1rem;margin-top:2px">🔑</span>
+      <div style="flex:1">
+        <div class="api-lbl">Claude API Key &nbsp;<span style="color:var(--muted);font-size:.58rem;letter-spacing:.5px;text-transform:none">· stays in your browser · <span style="color:var(--cyan);cursor:pointer" onclick="toggleGuide()">how to get it?</span></span></div>
+        <input type="password" id="apiKey" placeholder="sk-ant-api03-..." style="width:100%;background:transparent;border:none;color:var(--text);font-family:'Space Grotesk',sans-serif;font-size:.83rem;outline:none;" />
+      </div>
+    </div>
+
+    <div class="ig">
+      <div class="field">
+        <label>Channel Category</label>
+        <select id="category">
+          <option value="">Choose category...</option>
+          <option value="gaming">🎮 Gaming</option>
+          <option value="minecraft animation">⛏️ Minecraft Animation</option>
+          <option value="roblox">🎲 Roblox</option>
+          <option value="cooking and food">🍳 Cooking & Food</option>
+          <option value="fitness and health">💪 Fitness & Health</option>
+          <option value="personal finance">💰 Personal Finance</option>
+          <option value="tech and AI tutorials">💻 Tech & AI</option>
+          <option value="education">📚 Education</option>
+          <option value="comedy">😂 Comedy</option>
+          <option value="motivation">🔥 Motivation</option>
+          <option value="beauty and fashion">💄 Beauty & Fashion</option>
+          <option value="travel">✈️ Travel</option>
+          <option value="animals and pets">🐾 Animals & Pets</option>
+          <option value="DIY and crafts">🔨 DIY & Crafts</option>
+          <option value="music">🎵 Music</option>
+          <option value="sports highlights">⚽ Sports</option>
+          <option value="true crime">🔍 True Crime</option>
+          <option value="horror stories">😱 Horror</option>
+          <option value="anime">🌸 Anime</option>
+          <option value="other">✨ Other</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Target Audience</label>
+        <select id="audience">
+          <option value="kids aged 5-12">👶 Kids (5–12)</option>
+          <option value="teenagers aged 13-17">🧑 Teens (13–17)</option>
+          <option value="Gen Z aged 18-25" selected>⚡ Gen Z (18–25)</option>
+          <option value="millennials aged 26-40">💼 Millennials (26–40)</option>
+          <option value="adults over 40">👔 Adults (40+)</option>
+          <option value="global all ages">🌍 Global</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="field" style="margin-bottom:16px">
+      <label>Your Video Idea or Topic</label>
+      <textarea id="topic" placeholder="Describe your idea... e.g. 'Minecraft character survives impossible situations with a frying pan' or 'Quick healthy recipes under 60 seconds'"></textarea>
+    </div>
+
+    <div class="pill-lbl">Content Style — pick all that fit</div>
+    <div class="pill-row" id="stylePills">
+      <span class="pill" onclick="togglePill(this)">😂 Comedy</span>
+      <span class="pill active" onclick="togglePill(this)">⚡ Action</span>
+      <span class="pill" onclick="togglePill(this)">📖 Storytelling</span>
+      <span class="pill active" onclick="togglePill(this)">😱 POV</span>
+      <span class="pill" onclick="togglePill(this)">🎓 Educational</span>
+      <span class="pill" onclick="togglePill(this)">🔥 Viral/Trending</span>
+      <span class="pill" onclick="togglePill(this)">😌 Satisfying</span>
+      <span class="pill" onclick="togglePill(this)">💪 Motivational</span>
+      <span class="pill" onclick="togglePill(this)">🎬 Cinematic</span>
+      <span class="pill" onclick="togglePill(this)">🔄 Remake/Parody</span>
+    </div>
+
+    <div class="loader" id="loader">
+      <div class="loader-bar"><div class="loader-fill"></div></div>
+      <div class="loader-text">ZOA is analyzing trends for <em>your niche</em>...</div>
+    </div>
+
+    <button class="btn-gen" id="genBtn" onclick="generate()">⚡ Find My Niche Strategy</button>
+  </div>
+
+  <!-- RESULTS -->
+  <div id="results">
+    <div class="res-bar">
+      <div class="res-title">YOUR STRATEGY <span class="res-badge">✓ ZOA</span></div>
+      <button class="btn-copy-all" onclick="copyAll(this)">📋 Copy Everything</button>
+    </div>
+    <div class="rs" id="s1"><div class="r-lbl" style="color:var(--cyan)">🎯 Top Niche Ideas</div><div class="ideas-grid" id="ideasGrid"></div></div>
+    <div class="rs v" id="s2"><div class="r-lbl" style="color:var(--violet)">🏆 Viral Title Options</div><div class="r-cnt" id="titlesContent"></div><button class="r-cp" onclick="copySection('titlesContent',this)">📋 Copy Titles</button></div>
+    <div class="rs p" id="s3"><div class="r-lbl" style="color:var(--pink)">📝 Video Description</div><div class="r-cnt" id="descContent"></div><button class="r-cp" onclick="copySection('descContent',this)">📋 Copy Description</button></div>
+    <div class="rs g" id="s4"><div class="r-lbl" style="color:var(--green)">🏷️ Tags & Hashtags</div><div class="tags-wrap" id="tagsContent"></div><button class="r-cp" style="margin-top:10px" onclick="copyTags(this)">📋 Copy Tags</button></div>
+    <div class="rs gd" id="s5"><div class="r-lbl" style="color:var(--gold)">📈 Growth Strategy</div><div class="r-cnt" id="strategyContent"></div></div>
+  </div>
+
+  <!-- HOW -->
+  <div class="how">
+    <div class="s-lbl">The Process</div>
+    <div class="s-title">HOW ZOA WORKS</div>
+    <div class="s-sub">Three steps from idea to viral content</div>
+    <div class="how-grid">
+      <div class="hc"><div class="hc-n">01</div><div class="hc-i">🎯</div><div class="hc-t">Enter Your Niche</div><div class="hc-d">Tell ZOA your category, audience, and concept. The more specific, the sharper the analysis.</div></div>
+      <div class="hc"><div class="hc-n">02</div><div class="hc-i">🤖</div><div class="hc-t">AI Analyzes</div><div class="hc-d">ZOA researches viral patterns, competition levels, and growth strategies for your exact niche.</div></div>
+      <div class="hc"><div class="hc-n">03</div><div class="hc-i">🚀</div><div class="hc-t">Launch Ready</div><div class="hc-d">Get titles, descriptions, tags, and a full content strategy — optimized for the YouTube algorithm.</div></div>
+    </div>
+  </div>
+
+  <footer>
+    <span class="fl">ZOA</span>
+    NICHE FINDER · Powered by Claude AI · Free forever
+  </footer>
+</div>
+
+<script>
+let rawTags=[];
+
+function togglePill(el){el.classList.toggle('active');}
+
+function getStyles(){
+  return[...document.querySelectorAll('#stylePills .pill.active')].map(p=>p.textContent.trim()).join(', ');
+}
+
+async function generate(){
+  const key=document.getElementById('apiKey').value.trim();
+  const cat=document.getElementById('category').value;
+  const aud=document.getElementById('audience').value;
+  const topic=document.getElementById('topic').value.trim();
+  const styles=getStyles();
+
+  if(!key){alert('Please enter your Claude API key!\nClick "Get API Key" for help.');return;}
+  if(!cat){alert('Please select a channel category!');return;}
+  if(!topic){alert('Please describe your video idea!');return;}
+
+  const btn=document.getElementById('genBtn');
+  btn.disabled=true;btn.innerHTML='⏳ ZOA is working...';
+  document.getElementById('loader').classList.add('on');
+  document.getElementById('results').classList.remove('on');
+
+  const prompt=`You are ZOA, an elite YouTube Shorts niche analyst. Analyze this creator profile and return a complete viral content strategy.
+
+PROFILE:
+- Category: ${cat}
+- Audience: ${aud}
+- Video Concept: ${topic}
+- Styles: ${styles||'flexible'}
+
+Respond ONLY with valid JSON, no markdown:
+{
+  "niches":[
+    {"title":"Niche video title","why":"Why viral in 1-2 sentences","score":"hot","format":"Format type"},
+    {"title":"Second idea","why":"Why viral","score":"rising","format":"Format type"},
+    {"title":"Third idea","why":"Why viral","score":"stable","format":"Format type"}
+  ],
+  "titles":["🔥 Title 1","😱 Title 2","💀 Title 3","⚡ Title 4","🎯 Title 5"],
+  "description":"Complete YouTube description with emojis, CTA, hashtags. 4-5 lines, natural tone.",
+  "tags":["tag1","tag2","tag3","tag4","tag5","tag6","tag7","tag8","tag9","tag10","tag11","tag12","tag13","tag14","tag15","tag16","tag17","tag18","tag19","tag20"],
+  "strategy":"4 specific actionable growth tactics for this niche. Include: optimal posting time, hook formula, one underused tactic, audience engagement trick."
+}`;
+
+  try{
+    const res=await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',
+      headers:{'Content-Type':'application/json','x-api-key':key,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
+      body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1500,messages:[{role:'user',content:prompt}]})
+    });
+    const data=await res.json();
+    if(data.error)throw new Error(data.error.message);
+    const match=data.content[0].text.match(/\{[\s\S]*\}/);
+    if(!match)throw new Error('Could not parse response');
+    renderResults(JSON.parse(match[0]));
+  }catch(e){
+    alert('Error: '+e.message+'\n\nCheck your API key has credits.');
+  }
+
+  btn.disabled=false;btn.innerHTML='⚡ Find My Niche Strategy';
+  document.getElementById('loader').classList.remove('on');
+}
+
+function renderResults(d){
+  document.getElementById('ideasGrid').innerHTML=(d.niches||[]).map((n,i)=>`
+    <div class="idea-card" onclick="selIdea(this)">
+      <div class="idea-top">
+        <div class="idea-num">IDEA ${i+1}</div>
+        <span class="idea-sc sc-${n.score==='hot'?'h':n.score==='rising'?'r':'s'}">${n.score==='hot'?'🔥 HOT':n.score==='rising'?'⬆️ RISING':'✅ STABLE'}</span>
+      </div>
+      <div class="idea-t">${n.title}</div>
+      <div class="idea-w">${n.why}</div>
+      <div class="idea-f">${n.format||''}</div>
+    </div>`).join('');
+
+  document.getElementById('titlesContent').textContent=(d.titles||[]).join('\n');
+  document.getElementById('descContent').textContent=d.description||'';
+  rawTags=d.tags||[];
+  document.getElementById('tagsContent').innerHTML=rawTags.map(t=>`<span class="tag-chip" onclick="cpTag(this)">#${t}</span>`).join('');
+  document.getElementById('strategyContent').textContent=d.strategy||'';
+  document.getElementById('results').classList.add('on');
+  setTimeout(()=>document.getElementById('results').scrollIntoView({behavior:'smooth',block:'start'}),100);
+}
+
+function selIdea(el){document.querySelectorAll('.idea-card').forEach(c=>c.classList.remove('sel'));el.classList.add('sel');}
+function copySection(id,btn){navigator.clipboard.writeText(document.getElementById(id).textContent);const o=btn.textContent;btn.textContent='✅ Copied!';setTimeout(()=>btn.textContent=o,2000);}
+function copyTags(btn){navigator.clipboard.writeText(rawTags.map(t=>'#'+t).join(', '));const o=btn.textContent;btn.textContent='✅ Copied!';setTimeout(()=>btn.textContent=o,2000);}
+function cpTag(el){navigator.clipboard.writeText(el.textContent);el.style.borderColor='var(--violet)';el.style.color='var(--violet)';setTimeout(()=>{el.style.borderColor='';el.style.color='';},1000);}
+function copyAll(btn){
+  const t=document.getElementById('titlesContent').textContent;
+  const d=document.getElementById('descContent').textContent;
+  const tg=rawTags.map(t=>'#'+t).join(', ');
+  const s=document.getElementById('strategyContent').textContent;
+  navigator.clipboard.writeText(`=== VIRAL TITLES ===\n${t}\n\n=== DESCRIPTION ===\n${d}\n\n=== TAGS ===\n${tg}\n\n=== GROWTH STRATEGY ===\n${s}`);
+  const o=btn.textContent;btn.textContent='✅ Copied Everything!';setTimeout(()=>btn.textContent=o,2000);
+}
+</script>
+</body>
+</html>
